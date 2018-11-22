@@ -9,6 +9,7 @@ import './NavMenu.css';
 export class NavMenu extends React.Component {
   // displayName = NavMenu.name
 
+  // copied from TrackMED-RJS-VS
   public render() {
     return (
       <Navbar inverse={true} fixedTop={true} fluid={true} collapseOnSelect={true}>

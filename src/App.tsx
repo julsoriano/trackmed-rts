@@ -1,15 +1,16 @@
 import * as React from 'react';
 import { Route } from 'react-router';
+import { Layout } from './components/Layout';
+
+/* Components */
+import { Home } from './components/Home';
 import { Counter } from './components/Counter';
 import { FetchDescription } from './components/FetchDescription';
 import { FetchLocation } from './components/FetchLocation';
 import { FetchOwner } from './components/FetchOwner';
-import { Home } from './components/Home';
-import { Layout } from './components/Layout';
-
 
 export default class App extends React.Component {
-  // private displayName = App.name
+// private displayName = App.name
 
   public render() {
     return (
