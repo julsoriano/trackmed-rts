@@ -4,43 +4,44 @@ import { RouteComponentProps } from 'react-router';
 import './Base.css';
 import { isNullOrUndefined } from 'util';
 
-interface IFetchCommonTableState {
-    descriptions: ICommonTable[];
+interface IFetchComponentTableState {
+    descriptions: IComponentTable[];
     loading: boolean;
 }
 
 // Table cloned from TrackMED-RJS-VS
-export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonTableState> {
-    protected renderCommonTable(descriptions: ICommonTable[]) { 
-        return <table className='table table-striped table-condensed table-hover dataTable no-footer' >
+export class Popup extends React.Component<RouteComponentProps<{}>, IFetchComponentTableState> {
+    protected renderCommonTable(descriptions: IComponentTable[]) { 
+        return <table id="nestedTable" className='table table-light table-striped table-condensed table-hover table-component'>
             <thead>
-                <tr>
-                    <th></th>
+                <tr role="row">
                     <th>Sequence #</th>
-                    <th>Id</th>
+                    <th>Asset#</th>
+                    <th>IMTE</th>
+                    <th>Serial Number</th>
                     <th>Description</th>
-                    <th>Created Date</th>
+                    <th>Owner</th>
+                    <th>Status</th>
+                    <th>Model/Manufacturer</th>
+                    <th>Service Provider</th>
+                    <th>Calibration Due Date</th>
+                    <th>Maintenance Due Date</th>                   
                 </tr>
             </thead>
             <tbody>
-            {descriptions.map( (description, index) =>
+            {descriptions.map( (item, index) =>
                 <tr key={ index + 1 }>
-                    <td data-id={ description.id } className='details-control glyphicon glyphicon-plus' 
-                        onClick={this.showRelatedTable}></td>
-                    <td>{ index + 1 }</td>
-                    <td>{ description.id }</td>
-                    <td>{ description.desc }</td>
-                    <td>{ new Date(description.createdAtUtc).toLocaleDateString('en-GB', this.options) }</td>
-                    <td>
-                        <button className='glyphicon glyphicon-trash'>
-                            <span className="tooltiptext">Delete</span>
-                        </button>
-                    </td>
-                    <td>
-                        <button className='glyphicon glyphicon-check'>
-                            <span className="tooltiptext">Edit</span>
-                        </button>
-                    </td>                  
+                  <td>{ index + 1 }</td>
+                  <td>{ item.assetnumber }</td>
+                  <td>{ item.imte }</td>
+                  <td>{ item.serialnumber }</td>
+                  <td>{ item.description !== null ? item.description : '' }</td> 
+                  <td>{ item.owner !== null ? item.owner : '' }</td>
+                  <td>{ item.status !== null ? item.status : '' }</td>
+                  <td>{ item.model_Manufacturer !== null ? item.model_Manufacturer : '' }</td>
+                  <td>{ item.providerOfService !== null ? item.providerOfService : '' }</td>                                      
+                  <td>{ item.calibrationDate !== null ? ( new Date(item.calibrationDate).toLocaleDateString('en-GB', this.options) ) : '' }</td>
+                  <td>{ item.maintenanceDate !== null ? ( new Date(item.maintenanceDate).toLocaleDateString('en-GB', this.options) ) : '' }</td>
               </tr>
           )}
           </tbody>
@@ -66,7 +67,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
 
         /* replaced by getItems for inheritance
         fetch(this.itemUrl)
-        .then(response => response.json() as Promise<ICommonTable[]>)
+        .then(response => response.json() as Promise<IComponentTable[]>)
         .then(data => {
             this.setState({ descriptions: data, loading: false });
         });
@@ -86,7 +87,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         this.title = title;
         this.tableName = /api\/(.+$)/.exec(itemApi);
         fetch(this.itemUrl + itemApi)
-        .then(response => response.json() as Promise<ICommonTable[]>)
+        .then(response => response.json() as Promise<IComponentTable[]>)
         .then(data => {
             this.setState({ descriptions: data, loading: false });
         });
@@ -257,8 +258,16 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
     }
 }
 
-interface ICommonTable {
-  id: string;
-  desc: string;
-  createdAtUtc: string;
+interface IComponentTable {
+    id: string;
+    assetnumber: string;
+    imte: string;
+    serialnumber: string;
+    description: string;
+    owner: string;
+    status: string;
+    model_Manufacturer: string;
+    providerOfService: string;
+    calibrationDate: Date;
+    maintenanceDate: Date;
 }

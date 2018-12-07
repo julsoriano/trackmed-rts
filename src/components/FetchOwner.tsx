@@ -11,7 +11,7 @@ export class FetchOwner extends Base {
   }   
 
   public componentDidMount() {   
-    this.getItems(this.itemUrl, this.itemApi, this.title);
+    this.getItems(this.itemApi, this.title);
   }
 
 }
