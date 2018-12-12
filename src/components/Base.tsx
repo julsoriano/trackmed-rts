@@ -12,7 +12,7 @@ interface IFetchCommonTableState {
 // Table cloned from TrackMED-RJS-VS
 export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonTableState> {
     protected renderCommonTable(descriptions: ICommonTable[]) { 
-        return <table className='table table-striped table-condensed table-hover dataTable no-footer' >
+        return <table className='table table-striped table-condensed table-hover' >
             <thead>
                 <tr>
                     <th></th>
@@ -113,27 +113,33 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         fetch(urlComplete)
         .then(response => response.json()) 
         .then(data => {
-            // this.setState({ medComponents: data, loading: false });
             // console.log("Number of Components = " + Object.keys(data).length);
             // console.log(data);
 
             // create a <table> element
             this.tr = document.createElement("tr");
+            this.tr.setAttribute("id", "NestedTR");
+
+            // START:   C R E A T E   C H I L D    R O W  using a component
+            // this.setState({ medComponents: data, loading: false });
+
+            // START: C R E A T E   C H I L D   R O W using Javascript
             var td = document.createElement("td");
-            td.setAttribute("colspan", "5");
+            td.setAttribute("colspan", "7");
             
             var tbl = document.createElement("table");
-            tbl.classList.add('table', 'table-striped', 'table-condensed', 'table-hover', 'table-component');
+            tbl.classList.add('table', 'table-light', 'table-striped', 'table-condensed', 'table-hover', 'table-component');
 
             // create a <thead> element and its child nodes (<tr> and <th>)
             var tblHead = document.createElement("thead");
             var rowH = document.createElement("tr");
+            rowH.setAttribute("role", "row");
 
             // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/getOwnPropertyNames
             const fieldNames = Object.getOwnPropertyNames(headings);
 
             var cell = document.createElement("th");
-            cell.style.color = "blue";
+            // cell.style.color = "blue";
 
             // this will be placed on the 1st column by default
             var cellText = document.createTextNode("Sequence#");
@@ -145,7 +151,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
                 var hdg = headings[fn];
                 if (hdg != null) {
                     cell = document.createElement("th");
-                    cell.style.color = "blue";
+                    // cell.style.color = "blue";
                     cellText = document.createTextNode(hdg);
                     cell.appendChild(cellText);
                     rowH.appendChild(cell);
@@ -177,7 +183,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
                     // console.log('Key : ' + key + ', Value : ' + x[key]);
                 
                     cell = document.createElement("td");
-                    cell.style.color = "red";
+                    // cell.style.color = "red";
                     if( headings[key] === 'Description' || 
                         headings[key] === 'Owner' ||
                         headings[key] === 'Status' ||
@@ -212,7 +218,8 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             this.tr.appendChild(td);
 
             elGP.insertBefore(this.tr, elP.nextSibling); 
-            // return this.tr;  
+            // END: C R E A T E   C H I L D   R O W using Javascript           
+
         });
     };
 

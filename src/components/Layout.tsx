@@ -14,6 +14,10 @@ export class Layout extends React.Component<ILayoutProps, {}> {
                 </div>
                 <div className='col-sm-9'>
                     { this.props.children }
+                    <hr /> 
+                    <footer>
+                        <p>&copy; 2018 - J. Soriano</p>
+                    </footer>
                 </div>
             </div>
         </div>;
