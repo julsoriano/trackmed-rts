@@ -1,23 +1,30 @@
 // Inheritance: https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
 import * as React from 'react';
+import * as ReactDOM from 'react-dom';
 import { RouteComponentProps } from 'react-router';
 import './Base.css';
 import { isNullOrUndefined } from 'util';
 
+import { IComponentTable } from './popup/MedComp.popup'
+import { ISystemTable } from './popup/MedSystem.popup'
+import MedComp from './popup/MedComp.popup';
+import MedSystem from './popup/MedSystem.popup';
+
 interface IFetchCommonTableState {
     descriptions: ICommonTable[];
+    medComponents: IComponentTable[];
+    medSystems: ISystemTable[];
     loading: boolean;
 }
 
 // Table cloned from TrackMED-RJS-VS
-export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonTableState> {
+export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonTableState > {
     protected renderCommonTable(descriptions: ICommonTable[]) { 
-        return <table className='table table-striped table-condensed table-hover' >
+        return <table className='table-striped table-condensed table-hover' style={ this.style1 }>
             <thead>
                 <tr>
                     <th></th>
-                    <th>Sequence #</th>
-                    <th>Id</th>
+                    <th>Index</th>
                     <th>Description</th>
                     <th>Created Date</th>
                 </tr>
@@ -28,7 +35,6 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
                     <td data-id={ description.id } className='details-control glyphicon glyphicon-plus' 
                         onClick={this.showRelatedTable}></td>
                     <td>{ index + 1 }</td>
-                    <td>{ description.id }</td>
                     <td>{ description.desc }</td>
                     <td>{ new Date(description.createdAtUtc).toLocaleDateString('en-GB', this.options) }</td>
                     <td>
@@ -53,6 +59,10 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
     private options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     private tr: any;
     private elListSave: any;
+    private style1 = {
+        cellspacing: '0',
+        width: '100%'
+    }
 
     constructor(props:any) {
 
@@ -62,6 +72,8 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         
         this.state = { 
             descriptions: [], 
+            medComponents: [],
+            medSystems: [],
             loading: true };
 
         /* replaced by getItems for inheritance
@@ -73,6 +85,51 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         */
     }
 
+    popupComponentTable(root:HTMLElement) {
+        // alert(Array.isArray(this.state.medComponents) ? "medComponents is an Array" : "medComponents is not an Array");
+        ReactDOM.render(  
+        <td colSpan = {4}>
+            <table className='table table-light table-striped'>
+				<thead>
+					<tr>
+						<th>Index</th>
+						<th>Asset#</th>
+						<th>IMTE</th>
+						<th>Serial Number</th>
+						<th>Description</th>
+						<th>Owner</th>
+						<th>Status</th>
+						<th>Model/Manufacturer</th>
+						<th>Service Provider</th>
+						<th>Calibration Due Date</th>
+						<th>Maintenance Due Date</th>                   
+					</tr>
+				</thead> 
+                    <MedComp data = { this.state.medComponents } />
+            </table>
+        </td>, root);
+    }
+    
+    popupSystemTable(root:HTMLElement) {
+        // alert(Array.isArray(this.state.medSystems) ? "medSystems is an Array" : "medSystems is not an Array");
+        ReactDOM.render(  
+        <td colSpan = {4}>
+            <table className='table table-light table-striped'>
+				<thead>
+                    <tr role="row">
+                        <th>Index</th>
+                        <th>IMTE</th>
+                        <th>Reference No.</th>
+                        <th>System Description</th>
+                        <th>Deployment Date</th>
+                        <th>Location</th>                   
+                    </tr>
+				</thead> 
+                    <MedSystem data = { this.state.medSystems } />
+            </table>
+        </td>, root);
+    }
+    
     // Function to compare two objects by comparing their `desc` property.const
     // From: https://stackoverflow.com/questions/42203953/angular2-rxjs-order-observable-list-of-objects-by-an-observable-field 
     private compareFn = (a:any, b:any) => {
@@ -82,9 +139,9 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
     }; 
 
     getItems(itemApi:string, title:string) {
-        // alert(this.itemUrl + itemApi);
         this.title = title;
-        this.tableName = /api\/(.+$)/.exec(itemApi);
+        this.tableName = /^api\/(.+$)/.exec(itemApi);
+        // alert(this.tableName[1]);
         fetch(this.itemUrl + itemApi)
         .then(response => response.json() as Promise<ICommonTable[]>)
         .then(data => {
@@ -106,7 +163,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
     }    
 
     // Dynamically compose nested table
-    createNestedTable(id:string, elGP:Node, elP:Node, headings:any) {
+    createNTableHTML(id:string, elGP:Node, elP:Node, headings:any) {
 
         let urlComplete = this.itemUrl + 'api/Component/' + this.tableName[1] + '/' + id;
 
@@ -142,7 +199,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             // cell.style.color = "blue";
 
             // this will be placed on the 1st column by default
-            var cellText = document.createTextNode("Sequence#");
+            var cellText = document.createTextNode("Index");
             cell.appendChild(cellText);
             rowH.appendChild(cell);
 
@@ -223,6 +280,40 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         });
     };
 
+    // Dynamically compose nested table: Using Custom HTML Elements
+    createNTableHTMLCustom(id:string, elGP:Node, elP:Node) {
+        // create a <table> row element
+        this.tr = document.createElement("tr");
+        this.tr.setAttribute("id", "NestedTR");
+
+        let apiTbl = 'api/Component';    
+        this.tableName[1] === 'Location' ? apiTbl = 'api/SystemTab/' : apiTbl = 'api/Component/';
+        let urlComplete = this.itemUrl + apiTbl + this.title + '/' + id;
+        // alert(urlComplete);
+        fetch(urlComplete)
+        .then(response => response.json()) 
+        .then(data => {
+            
+            // this.setState({ tableName[1]: this.tableName[1], id: this.id });
+ 
+            if( this.tableName[1] === 'Description' || 
+                this.tableName[1] === 'Owner' ||
+                this.tableName[1] === 'Status' ||
+                this.tableName[1] === 'Model/Manufacturer' ||
+                this.tableName[1] === 'Service Provider' ) {             
+
+                this.setState({ medComponents: data, loading: false });
+                this.popupComponentTable(this.tr); 
+        
+            } else if( this.tableName[1] === 'Location') {
+
+                this.setState({ medSystems: data, loading: false });
+                this.popupSystemTable(this.tr); 
+            }  
+            
+            elGP.insertBefore(this.tr, elP.nextSibling);  
+        });         
+    };    
 
     showRelatedTable(event:any) {
         event.preventDefault();
@@ -231,6 +322,13 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         let elP = event.target.parentNode; // Parent Node: tr
         let elGP = elP.parentNode;         // Parent Node: tbody
         let elList = event.target.classList;
+
+        /* Uncomment for testing only
+        let div = document.createElement('div');
+        let span = document.createElement('p');
+        span.innerHTML = 'No Records to Display';
+        div.appendChild(span);
+        */    
         
         if (elList.contains('glyphicon-plus')) {
             
@@ -240,7 +338,10 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             if( !isNullOrUndefined(this.elListSave)) this.elListSave.replace('glyphicon-minus', 'glyphicon-plus');
 
             // appends child <table> into table <tbody>
-            this.createNestedTable(id, elGP, elP, this.headings);
+            // this.createNTableHTML(id, elGP, elP, this.headings);
+
+            // create nested table using custom HTML elements
+            this.createNTableHTMLCustom(id, elGP, elP);   
 
             this.elListSave = elList;
 
