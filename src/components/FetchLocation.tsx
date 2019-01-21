@@ -1,16 +1,12 @@
 import { Base } from './Base';
 
+// Inheritance: https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
 export class FetchLocation extends Base {
 
   // selFlag: Boolean;
   protected itemApi = 'api/Location';
-  protected title: string = "Location";
- 
-  constructor(props:any) { 
-    super(props); 
-  }   
 
   public componentDidMount() {   
-    this.getItems(this.itemApi, this.title);
+    this.getItems(this.itemApi);
   }
 }

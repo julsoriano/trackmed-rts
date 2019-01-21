@@ -1,10 +1,10 @@
-// Inheritance: https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { RouteComponentProps } from 'react-router';
 import './Base.css';
 import { isNullOrUndefined } from 'util';
 
+// Nested Tables
 import { IComponentTable } from './popup/MedComp.popup'
 import { ISystemTable } from './popup/MedSystem.popup'
 import MedComp from './popup/MedComp.popup';
@@ -17,8 +17,8 @@ interface IFetchCommonTableState {
     loading: boolean;
 }
 
-// Table cloned from TrackMED-RJS-VS
 export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonTableState > {
+    // Table cloned from TrackMED-RJS-VS
     protected renderCommonTable(descriptions: ICommonTable[]) { 
         return <table className='table-striped table-condensed table-hover' style={ this.style1 }>
             <thead>
@@ -75,14 +75,6 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             medComponents: [],
             medSystems: [],
             loading: true };
-
-        /* replaced by getItems for inheritance
-        fetch(this.itemUrl)
-        .then(response => response.json() as Promise<ICommonTable[]>)
-        .then(data => {
-            this.setState({ descriptions: data, loading: false });
-        });
-        */
     }
 
     popupComponentTable(root:HTMLElement) {
@@ -138,9 +130,9 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         return 0;
     }; 
 
-    getItems(itemApi:string, title:string) {
-        this.title = title;
+    getItems(itemApi:string) {
         this.tableName = /^api\/(.+$)/.exec(itemApi);
+        this.title = this.tableName[1];
         // alert(this.tableName[1]);
         fetch(this.itemUrl + itemApi)
         .then(response => response.json() as Promise<ICommonTable[]>)
@@ -162,7 +154,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         'maintenanceDate' : 'Maintenance Due Date'
     }    
 
-    // Dynamically compose nested table
+    // Dynamically compose nested table - element for element
     createNTableHTML(id:string, elGP:Node, elP:Node, headings:any) {
 
         let urlComplete = this.itemUrl + 'api/Component/' + this.tableName[1] + '/' + id;
@@ -170,15 +162,10 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         fetch(urlComplete)
         .then(response => response.json()) 
         .then(data => {
-            // console.log("Number of Components = " + Object.keys(data).length);
-            // console.log(data);
 
             // create a <table> element
             this.tr = document.createElement("tr");
             this.tr.setAttribute("id", "NestedTR");
-
-            // START:   C R E A T E   C H I L D    R O W  using a component
-            // this.setState({ medComponents: data, loading: false });
 
             // START: C R E A T E   C H I L D   R O W using Javascript
             var td = document.createElement("td");
@@ -196,7 +183,6 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             const fieldNames = Object.getOwnPropertyNames(headings);
 
             var cell = document.createElement("th");
-            // cell.style.color = "blue";
 
             // this will be placed on the 1st column by default
             var cellText = document.createTextNode("Index");
@@ -208,7 +194,6 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
                 var hdg = headings[fn];
                 if (hdg != null) {
                     cell = document.createElement("th");
-                    // cell.style.color = "blue";
                     cellText = document.createTextNode(hdg);
                     cell.appendChild(cellText);
                     rowH.appendChild(cell);
@@ -237,9 +222,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
                 
                 // https://stackoverflow.com/questions/37673454/javascript-iterate-key-value-from-json/37673499                
                 Object.keys(headings).forEach(function(key) {
-                    // console.log('Key : ' + key + ', Value : ' + x[key]);
-                
-                    cell = document.createElement("td");
+                     cell = document.createElement("td");
                     // cell.style.color = "red";
                     if( headings[key] === 'Description' || 
                         headings[key] === 'Owner' ||
@@ -280,32 +263,32 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         });
     };
 
-    // Dynamically compose nested table: Using Custom HTML Elements
-    createNTableHTMLCustom(id:string, elGP:Node, elP:Node) {
+    // Dynamically compose nested table using a component
+    createNTableComponent(id:string, elGP:Node, elP:Node) {
         // create a <table> row element
         this.tr = document.createElement("tr");
         this.tr.setAttribute("id", "NestedTR");
 
-        let apiTbl = 'api/Component';    
-        this.tableName[1] === 'Location' ? apiTbl = 'api/SystemTab/' : apiTbl = 'api/Component/';
+        let apiTbl;    
+        this.title === 'Location' ? apiTbl = 'api/SystemTab/' : apiTbl = 'api/Component/';
         let urlComplete = this.itemUrl + apiTbl + this.title + '/' + id;
         // alert(urlComplete);
         fetch(urlComplete)
         .then(response => response.json()) 
         .then(data => {
             
-            // this.setState({ tableName[1]: this.tableName[1], id: this.id });
+            // this.setState({ title: this.title, id: this.id });
  
-            if( this.tableName[1] === 'Description' || 
-                this.tableName[1] === 'Owner' ||
-                this.tableName[1] === 'Status' ||
-                this.tableName[1] === 'Model/Manufacturer' ||
-                this.tableName[1] === 'Service Provider' ) {             
+            if( this.title === 'Description' || 
+                this.title === 'Owner' ||
+                this.title === 'Status' ||
+                this.title === 'Model/Manufacturer' ||
+                this.title === 'Service Provider' ) {             
 
                 this.setState({ medComponents: data, loading: false });
                 this.popupComponentTable(this.tr); 
         
-            } else if( this.tableName[1] === 'Location') {
+            } else if( this.title === 'Location') {
 
                 this.setState({ medSystems: data, loading: false });
                 this.popupSystemTable(this.tr); 
@@ -341,7 +324,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
             // this.createNTableHTML(id, elGP, elP, this.headings);
 
             // create nested table using custom HTML elements
-            this.createNTableHTMLCustom(id, elGP, elP);   
+            this.createNTableComponent(id, elGP, elP);   
 
             this.elListSave = elList;
 

@@ -1,17 +1,14 @@
 import { Base } from './Base';
 
+// Inheritance: https://blogs.msdn.microsoft.com/premier_developer/2018/06/17/angular-how-to-simplify-components-with-typescript-inheritance/
 export class FetchOwner extends Base {
 
   // selFlag: Boolean;
-  protected itemApi = 'api/Owner';
-  protected title: string = "Owner";
- 
-  constructor(props:any) { 
-    super(props); 
-  }   
+  private itemApi = 'api/Owner';
+  // private title: string = "Owner";
 
   public componentDidMount() {   
-    this.getItems(this.itemApi, this.title);
+    this.getItems(this.itemApi);
   }
 
 }
