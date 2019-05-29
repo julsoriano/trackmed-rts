@@ -62,7 +62,17 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
     private style1 = {
         cellspacing: '0',
         width: '100%'
+    };
+    /*
+    private async function fetchAsync(url:string) {
+        // await response of fetch call
+        let response = await fetch(url);
+        // only proceed once promise is resolved
+        let data = await response.json();
+        // only proceed once second promise is resolved
+        return data;
     }
+    */
 
     constructor(props:any) {
 
@@ -129,7 +139,7 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         if (a.desc > b.desc) { return 1; }
         return 0;
     }; 
-
+    
     getItems(itemApi:string) {
         this.tableName = /^api\/(.+$)/.exec(itemApi);
         this.title = this.tableName[1];
@@ -138,7 +148,8 @@ export class Base extends React.Component<RouteComponentProps<{}>, IFetchCommonT
         .then(response => response.json() as Promise<ICommonTable[]>)
         .then(data => {
             this.setState({ descriptions: data, loading: false });
-        });
+        })
+        .catch(reason => console.log(reason.message));
     }
 
     headings = {
