@@ -9,6 +9,7 @@ export class Counter extends React.Component<RouteComponentProps<{}>, ICounterSt
     constructor(props:any) {
         super(props);
         this.state = { currentCount: 0 };
+        this.incrementCounter = this.incrementCounter.bind(this);
     }
 
     public render() {
